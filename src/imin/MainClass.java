@@ -31,7 +31,7 @@ import com.sun.mail.smtp.SMTPSendFailedException;
 import com.sun.mail.smtp.SMTPTransport;
 
 public class MainClass {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 		HelperClass hc = new HelperClass();
 		Calendar c = Calendar.getInstance();
@@ -41,7 +41,10 @@ public class MainClass {
 		c.set(Calendar.SECOND, 00);
 		
 		
-		if (!valid(c)) return;
+		if (!valid(c)) {
+			new Ui(HelperClass.getMetaContent());
+			return;
+		}
 		
 		Timer timer = new Timer();
 		timer.schedule(hc, c.getTime());
@@ -58,34 +61,37 @@ public class MainClass {
 
 class HelperClass extends TimerTask {
 	
-	String root = "C:/20150323/";
+	static String root = "C:/20150323/";
 
 	public void run() {
 		
 		try {
 			StringBuilder sb = new StringBuilder();
+
+			String[] a = getMetaContent();
 			
-			isAllInClass(sb);
+//			isAllInClass(sb);
 			
-//			if (isAllInClass(sb)) {
+			if (isAllInClass(sb)) {
 //			System.out.println(sb);
 
 				// sendMail
-				String[] a = getContent();
+				
 
 				smtpsend(a, sb.toString());
 
-//			} else {
+			} else {
 //
-//				// TODO: runGUI
-//			}
+				new Ui(a);
+//				smtpsend(a, ui.getContent());
+			}
 				
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private String[] getContent() throws Exception {
+	public static String[] getMetaContent() throws Exception {
 		Properties p = new Properties();
 		FileReader fr = new FileReader(root + "mail.properties");
 		p.load(fr);
@@ -165,7 +171,7 @@ class HelperClass extends TimerTask {
 	 * super.data(); } }
 	 */
 
-	public void smtpsend(String[] argv, String text) {
+	public static void smtpsend(String[] argv, String text) {
 		String to, subject = null, from = null, cc = null, bcc = null, url = null;
 		String mailhost = null;
 		String mailer = "smtpsend";
